@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ew.udm.service.mapper.RoleMapper">
+  <resultMap id="BaseResultMap" type="com.ew.udm.models.user.Role">
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="ORDER" jdbcType="INTEGER" property="order" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="ROLE" jdbcType="VARCHAR" property="role" />
+    <result column="DESCRIPTION" jdbcType="VARCHAR" property="description" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    `ID`, `ORDER`, `NAME`, `ROLE`, `DESCRIPTION`
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from bm_role
+    where `ID` = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from bm_role
+    where `ID` = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="id" parameterType="com.ew.udm.models.user.Role" useGeneratedKeys="true">
+    insert into bm_role (`ORDER`, `NAME`, `ROLE`, 
+      `DESCRIPTION`)
+    values (#{order,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{role,jdbcType=VARCHAR}, 
+      #{description,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="id" parameterType="com.ew.udm.models.user.Role" useGeneratedKeys="true">
+    insert into bm_role
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="order != null">
+        `ORDER`,
+      </if>
+      <if test="name != null">
+        `NAME`,
+      </if>
+      <if test="role != null">
+        `ROLE`,
+      </if>
+      <if test="description != null">
+        `DESCRIPTION`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="order != null">
+        #{order,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="role != null">
+        #{role,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ew.udm.models.user.Role">
+    update bm_role
+    <set>
+      <if test="order != null">
+        `ORDER` = #{order,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        `NAME` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="role != null">
+        `ROLE` = #{role,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        `DESCRIPTION` = #{description,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where `ID` = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ew.udm.models.user.Role">
+    update bm_role
+    set `ORDER` = #{order,jdbcType=INTEGER},
+      `NAME` = #{name,jdbcType=VARCHAR},
+      `ROLE` = #{role,jdbcType=VARCHAR},
+      `DESCRIPTION` = #{description,jdbcType=VARCHAR}
+    where `ID` = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

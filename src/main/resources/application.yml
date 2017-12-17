@@ -1,0 +1,61 @@
+server:
+  port: 8090
+  context-path: /udm
+#  error:
+#    include-stacktrace: always
+jwt:
+  secret: a34c0bcc-3e42-4770-925f-85119bc8fe13
+  expiration: 7200
+  header: Authorization
+  tokenHead: "Bearer "
+  route:
+    authentication:
+      path: /auth
+      refresh: /refresh
+      register: /register
+spring:
+  profiles:
+    active: default
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
+  jta:
+    log-dir: classpath:tx-logs
+    transaction-manager-id: txManager
+    atomikos:
+      datasource:
+        unique-resource-name: udm-datasource-1
+  datasource:
+      type: com.alibaba.druid.pool.xa.DruidXADataSource
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/bashmgr?useUnicode=true&characterEncoding=utf-8
+      username: root
+      password: root
+      xa:
+        data-source-class-name: com.alibaba.druid.pool.xa.DruidXADataSource
+        properties:
+          driver-class-name: com.mysql.jdbc.Driver
+          url: ${spring.datasource.url}
+          username: ${spring.datasource.username}
+          password: ${spring.datasource.password}
+          initialSize: 3
+          minIdle: 3
+          maxActive: 20
+          maxWait: 60000
+          logSlowSql: true
+          timeBetweenEvictionRunsMillis: 60000
+          minEvictableIdleTimeMillis: 300000
+          validationQuery: SELECT 1
+          testWhileIdle: true
+          testOnBorrow: false
+          testOnReturn: false
+          poolPreparedStatements: true
+          maxPoolPreparedStatementPerConnectionSize: 20
+          filters: stat
+logging:
+  config: classpath:log4j2.xml
+mybatis:
+  type-aliases-package: com.ew.udm.models.user
+  mapper-locations: classpath:/mapper/*.xml
+  config-location: classpath:/mybatis-config.xml
+

@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ew.udm.service.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.ew.udm.models.user.User">
+        <id column="ID" jdbcType="INTEGER" property="id"/>
+        <result column="USER_NAME" jdbcType="VARCHAR" property="userName"/>
+        <result column="PASSWORD" jdbcType="VARCHAR" property="password"/>
+        <result column="EMAIL" jdbcType="VARCHAR" property="email"/>
+        <result column="PHONE" jdbcType="VARCHAR" property="phone"/>
+        <result column="DISPLAY_NAME" jdbcType="VARCHAR" property="displayName"/>
+        <result column="DESCRIPTION" jdbcType="VARCHAR" property="description"/>
+        <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="LAST_LOGIN_TIME" jdbcType="TIMESTAMP" property="lastLoginTime"/>
+        <result column="IS_ENABLE" jdbcType="TINYINT" property="isEnable"/>
+        <result column="STATUS" jdbcType="INTEGER" property="status"/>
+        <result column="EXPIRE_TIME" jdbcType="TIMESTAMP" property="expireTime"/>
+        <result column="IS_LOCKED" jdbcType="TINYINT" property="isLocked"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    `ID`, `USER_NAME`, `PASSWORD`, `EMAIL`, `PHONE`, `DISPLAY_NAME`, `DESCRIPTION`, `CREATE_TIME`, 
+    `LAST_LOGIN_TIME`, `IS_ENABLE`, `STATUS`, `EXPIRE_TIME`, `IS_LOCKED`
+  </sql>
+    <resultMap id="userRoleCollectionMap" type="com.ew.udm.models.user.UserWithRole">
+        <id column="USER_ID" jdbcType="INTEGER" property="id"/>
+        <result column="USER_NAME" jdbcType="VARCHAR" property="userName"/>
+        <result column="PASSWORD" jdbcType="VARCHAR" property="password"/>
+        <result column="EMAIL" jdbcType="VARCHAR" property="email"/>
+        <result column="PHONE" jdbcType="VARCHAR" property="phone"/>
+        <result column="DISPLAY_NAME" jdbcType="VARCHAR" property="displayName"/>
+        <result column="DESCRIPTION" jdbcType="VARCHAR" property="description"/>
+        <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="LAST_LOGIN_TIME" jdbcType="TIMESTAMP" property="lastLoginTime"/>
+        <result column="IS_ENABLE" jdbcType="TINYINT" property="isEnable"/>
+        <result column="STATUS" jdbcType="INTEGER" property="status"/>
+        <result column="EXPIRE_TIME" jdbcType="TIMESTAMP" property="expireTime"/>
+        <result column="IS_LOCKED" jdbcType="TINYINT" property="isLocked"/>
+        <collection property="roleList" javaType="java.util.List" ofType="com.ew.udm.models.user.Role">
+            <id column="ROLE_ID" property="id" jdbcType="INTEGER"/>
+            <result column="ROLE_NAME" property="name" jdbcType="VARCHAR"/>
+            <result column="ROLE_DESCRIPTION" property="description" jdbcType="VARCHAR"/>
+            <result column="ROLE_ORDER" property="order" jdbcType="INTEGER"/>
+            <result column="ROLE" property="role" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+    <select id="selectUserRoleCollection" resultMap="userRoleCollectionMap">
+        SELECT u.`ID` AS `USER_ID`, u.`USER_NAME`, u.`DISPLAY_NAME`, u.`PASSWORD`, r.`ID` AS `ROLE_ID`, r.`name` AS `ROLE_NAME`, r.`ROLE`, u.`CREATE_TIME`, u.`DESCRIPTION`,
+         u.`EMAIL`, u.`EXPIRE_TIME`, u.`IS_ENABLE`, u.`IS_LOCKED`, u.`LAST_LOGIN_TIME`, u.`PHONE`, u.`STATUS`,
+         r.`DESCRIPTION` AS `ROLE_DESCRIPTION`, r.`ORDER` AS ROLE_ORDER
+        FROM `bm_user` u LEFT JOIN `bm_user_role` ur ON ur.`USER_ID`=u.`id` RIGHT JOIN `bm_role` r ON ur.`ROLE_ID`=r.`ID`
+        WHERE u.`user_name`=#{userName,jdbcType=VARCHAR}
+        UNION
+        SELECT u.`ID` AS `USER_ID`, u.`USER_NAME`, u.`DISPLAY_NAME`, u.`PASSWORD`, r.`ID` AS `ROLE_ID`, r.`name` AS `ROLE_NAME`, r.`ROLE`, u.`CREATE_TIME`, u.`DESCRIPTION`,
+         u.`EMAIL`, u.`EXPIRE_TIME`, u.`IS_ENABLE`, u.`IS_LOCKED`, u.`LAST_LOGIN_TIME`, u.`PHONE`, u.`STATUS`,
+         r.`DESCRIPTION` AS `ROLE_DESCRIPTION`, r.`ORDER` AS ROLE_ORDER
+        FROM `bm_user` u LEFT JOIN `bm_user_group` ug ON ug.`USER_ID`=u.`id` RIGHT JOIN `bm_group_role` gr ON ug.`GROUP_ID`=gr.`GROUP_ID` RIGHT JOIN `bm_role` r ON gr.`ROLE_ID`=r.`ID`
+        WHERE u.`user_name`=#{userName,jdbcType=VARCHAR} ORDER BY `ROLE_ORDER` ASC
+    </select>
+    <select id="countOfUserName" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(`ID`) FROM `bm_user` WHERE `user_name`=#{userName,jdbcType=VARCHAR}
+    </select>
+    <select id="countOfEmail" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(`ID`) FROM `bm_user` WHERE `user_name`=#{email,jdbcType=VARCHAR}
+    </select>
+    <select id="countOfPhone" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(`ID`) FROM `bm_user` WHERE `user_name`=#{phone,jdbcType=VARCHAR}
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `bm_user`
+        where `ID` = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `bm_user` order by `ID` asc
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from bm_user
+    where `ID` = #{id,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" keyColumn="ID" keyProperty="id" parameterType="com.ew.udm.models.user.User"
+            useGeneratedKeys="true">
+    insert into bm_user (`USER_NAME`, `PASSWORD`, `EMAIL`, 
+      `PHONE`, `DISPLAY_NAME`, `DESCRIPTION`, 
+      `CREATE_TIME`, `LAST_LOGIN_TIME`, `IS_ENABLE`, 
+      `STATUS`, `EXPIRE_TIME`, `IS_LOCKED`
+      )
+    values (#{userName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
+      #{phone,jdbcType=VARCHAR}, #{displayName,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{lastLoginTime,jdbcType=TIMESTAMP}, #{isEnable,jdbcType=TINYINT}, 
+      #{status,jdbcType=INTEGER}, #{expireTime,jdbcType=TIMESTAMP}, #{isLocked,jdbcType=TINYINT}
+      )
+  </insert>
+    <insert id="insertSelective" keyColumn="ID" keyProperty="id" parameterType="com.ew.udm.models.user.User"
+            useGeneratedKeys="true">
+        insert into bm_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userName != null">
+                `USER_NAME`,
+            </if>
+            <if test="password != null">
+                `PASSWORD`,
+            </if>
+            <if test="email != null">
+                `EMAIL`,
+            </if>
+            <if test="phone != null">
+                `PHONE`,
+            </if>
+            <if test="displayName != null">
+                `DISPLAY_NAME`,
+            </if>
+            <if test="description != null">
+                `DESCRIPTION`,
+            </if>
+            <if test="createTime != null">
+                `CREATE_TIME`,
+            </if>
+            <if test="lastLoginTime != null">
+                `LAST_LOGIN_TIME`,
+            </if>
+            <if test="isEnable != null">
+                `IS_ENABLE`,
+            </if>
+            <if test="status != null">
+                `STATUS`,
+            </if>
+            <if test="expireTime != null">
+                `EXPIRE_TIME`,
+            </if>
+            <if test="isLocked != null">
+                `IS_LOCKED`,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userName != null">
+                #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="displayName != null">
+                #{displayName,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lastLoginTime != null">
+                #{lastLoginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isEnable != null">
+                #{isEnable,jdbcType=TINYINT},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="expireTime != null">
+                #{expireTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isLocked != null">
+                #{isLocked,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ew.udm.models.user.User">
+        update bm_user
+        <set>
+            <if test="userName != null">
+                `USER_NAME` = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                `PASSWORD` = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                `EMAIL` = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                `PHONE` = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="displayName != null">
+                `DISPLAY_NAME` = #{displayName,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                `DESCRIPTION` = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                `CREATE_TIME` = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lastLoginTime != null">
+                `LAST_LOGIN_TIME` = #{lastLoginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isEnable != null">
+                `IS_ENABLE` = #{isEnable,jdbcType=TINYINT},
+            </if>
+            <if test="status != null">
+                `STATUS` = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="expireTime != null">
+                `EXPIRE_TIME` = #{expireTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isLocked != null">
+                `IS_LOCKED` = #{isLocked,jdbcType=TINYINT},
+            </if>
+        </set>
+        where `ID` = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ew.udm.models.user.User">
+    update bm_user
+    set `USER_NAME` = #{userName,jdbcType=VARCHAR},
+      `PASSWORD` = #{password,jdbcType=VARCHAR},
+      `EMAIL` = #{email,jdbcType=VARCHAR},
+      `PHONE` = #{phone,jdbcType=VARCHAR},
+      `DISPLAY_NAME` = #{displayName,jdbcType=VARCHAR},
+      `DESCRIPTION` = #{description,jdbcType=VARCHAR},
+      `CREATE_TIME` = #{createTime,jdbcType=TIMESTAMP},
+      `LAST_LOGIN_TIME` = #{lastLoginTime,jdbcType=TIMESTAMP},
+      `IS_ENABLE` = #{isEnable,jdbcType=TINYINT},
+      `STATUS` = #{status,jdbcType=INTEGER},
+      `EXPIRE_TIME` = #{expireTime,jdbcType=TIMESTAMP},
+      `IS_LOCKED` = #{isLocked,jdbcType=TINYINT}
+    where `ID` = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
