@@ -55,99 +55,7 @@
         </javaClientGenerator>
 
 
-
-        <!--对应数据库表 mysql可以加入主键自增 字段命名 忽略某字段等-->
-       <!-- <table tableName="area" domainObjectName="AreaInfo" enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"/>
-        <table tableName="authapp" domainObjectName="AuthApp" enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"/>
-        <table tableName="autharea" domainObjectName="AuthArea" enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
-        <table tableName="dataauth" domainObjectName="DataAuth" enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
-        <table tableName="datasource" domainObjectName="DataSourceInfo" enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
-        <table tableName="user" domainObjectName="User" enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"/>
-        <table tableName="usergroup" domainObjectName="UserGroup" enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
-        <table tableName="values" domainObjectName="Value" enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"/>
-        <table tableName="classinfo" domainObjectName="ClassInfo" enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
-        <table tableName="persistent_logins" domainObjectName="PersistentLogin" enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
-        <table tableName="base_voltage" domainObjectName="BaseVoltage" enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
-        <table tableName="line_type" domainObjectName="LineType" enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
-        <table tableName="power_config" domainObjectName="PowerConfig" enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
-
-        <table tableName="aside_menu" domainObjectName="AsideMenu" enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
-        <table tableName="models" domainObjectName="Model" enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
-        <table tableName="icons" domainObjectName="Icon" enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
-        <table tableName="device_type" domainObjectName="DeviceType" enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
-        <table tableName="device_property_group" domainObjectName="DevicePropertyGroup" enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
-        <table tableName="device_property" domainObjectName="DeviceProperty" enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
-        <table tableName="property_list" domainObjectName="DevicePropertyList"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"
-               delimitAllColumns="true" delimitIdentifiers="`">
-            <generatedKey column="ID" sqlStatement="MySql"/>
-        </table>
-        <table tableName="property_role" domainObjectName="DevicePropertyRole"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"
-               delimitAllColumns="true" delimitIdentifiers="`">
-            <generatedKey column="ID" sqlStatement="MySql"/>
-        </table>
-        <table tableName="dataauth" domainObjectName="DataAuth"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"
-               delimitAllColumns="true" delimitIdentifiers="`">
-            <generatedKey column="ID" sqlStatement="MySql"/>
-
-        <table tableName="ph_rule" domainObjectName="PHRule"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"
-               delimitAllColumns="true" delimitIdentifiers="`">
-            <generatedKey column="Id" sqlStatement="JDBC"/>
-        </table>
-        <table tableName="ph_rule_config" domainObjectName="PHRuleConfig"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"
-               delimitAllColumns="true" delimitIdentifiers="`">
-            <generatedKey column="Id" sqlStatement="JDBC"/>
-        </table>
-        <table tableName="ph_rule_relation" domainObjectName="PHRuleRelation"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"
-               delimitAllColumns="true" delimitIdentifiers="`">
-            <generatedKey column="Id" sqlStatement="JDBC"/>
-        </table>-->
-        <table tableName="bm_auth" domainObjectName="Auth"
+      <!--  <table tableName="bm_auth" domainObjectName="Auth"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"
                delimitAllColumns="true" delimitIdentifiers="`">
@@ -195,6 +103,13 @@
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"
                delimitAllColumns="true" delimitIdentifiers="`">
             <generatedKey column="ID" sqlStatement="JDBC"/>
+        </table>-->
+        <table tableName="bm_token" domainObjectName="UserToken"
+               enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"
+               delimitAllColumns="true" delimitIdentifiers="`">
+            <generatedKey column="ID" sqlStatement="JDBC"/>
         </table>
+
     </context>
 </generatorConfiguration>

@@ -84,12 +84,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login(String username, String password) {
+    public String login(String username, String password, int expireDays, String userAgent) {
         UsernamePasswordAuthenticationToken upToken = new UsernamePasswordAuthenticationToken(username, password);
         final Authentication authentication = authenticationManager.authenticate(upToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return jwtTokenUtil.generateToken(userDetails);
+        User user = userMapper.selectByUsername(username);
+        return jwtTokenUtil.generateNewToken(user, expireDays, userAgent);
     }
 
     @Override

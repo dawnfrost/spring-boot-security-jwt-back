@@ -27,4 +27,6 @@ public interface UserMapper {
     int countOfUserName(String userName);
     int countOfEmail(String email);
     int countOfPhone(String phone);
+
+    User selectByUsername(String username);
 }

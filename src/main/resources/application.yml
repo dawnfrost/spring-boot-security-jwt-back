@@ -1,21 +1,30 @@
 server:
-  port: 8090
+  port: 7780
   context-path: /udm
+  tomcat:
+      uri-encoding: UTF-8
 #  error:
 #    include-stacktrace: always
 jwt:
   secret: a34c0bcc-3e42-4770-925f-85119bc8fe13
   expiration: 7200
   header: Authorization
+  device: User-Agent
   tokenHead: "Bearer "
-  route:
-    authentication:
-      path: /auth
-      refresh: /refresh
-      register: /register
 spring:
   profiles:
     active: default
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  thymeleaf:
+    encoding: UTF-8
+  mail:
+    default-encoding: UTF-8
+  messages:
+    encoding: UTF-8
   jackson:
     serialization:
       INDENT_OUTPUT: true
@@ -58,4 +67,6 @@ mybatis:
   type-aliases-package: com.ew.udm.models.user
   mapper-locations: classpath:/mapper/*.xml
   config-location: classpath:/mybatis-config.xml
+banner:
+  charset: UTF-8
 

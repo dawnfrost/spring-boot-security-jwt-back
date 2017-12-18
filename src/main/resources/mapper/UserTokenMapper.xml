@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ew.udm.service.mapper.UserTokenMapper">
+  <resultMap id="BaseResultMap" type="com.ew.udm.models.user.UserToken">
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="USER_ID" jdbcType="INTEGER" property="userId" />
+    <result column="USER_AGENT" jdbcType="VARCHAR" property="userAgent" />
+    <result column="REFRESH_TOKEN" jdbcType="VARCHAR" property="refreshToken" />
+    <result column="REFRESH_TOKEN_CREATE_TIME" jdbcType="TIMESTAMP" property="refreshTokenCreateTime" />
+    <result column="REFRESH_TOKEN_EXPIRE_TIME" jdbcType="TIMESTAMP" property="refreshTokenExpireTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    `ID`, `USER_ID`, `USER_AGENT`, `REFRESH_TOKEN`, `REFRESH_TOKEN_CREATE_TIME`, `REFRESH_TOKEN_EXPIRE_TIME`
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from bm_token
+    where `ID` = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectByUserIdAndAgent" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from bm_token
+    where `USER_ID` = #{userId,jdbcType=INTEGER} and `USER_AGENT` = #{userAgent,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByRefreshToken" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from bm_token
+    where `REFRESH_TOKEN` = #{refreshToken,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from bm_token
+    where `ID` = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="id" parameterType="com.ew.udm.models.user.UserToken" useGeneratedKeys="true">
+    insert into bm_token (`USER_ID`, `USER_AGENT`, `REFRESH_TOKEN`, 
+      `REFRESH_TOKEN_CREATE_TIME`, `REFRESH_TOKEN_EXPIRE_TIME`
+      )
+    values (#{userId,jdbcType=INTEGER}, #{userAgent,jdbcType=VARCHAR}, #{refreshToken,jdbcType=VARCHAR}, 
+      #{refreshTokenCreateTime,jdbcType=TIMESTAMP}, #{refreshTokenExpireTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="id" parameterType="com.ew.udm.models.user.UserToken" useGeneratedKeys="true">
+    insert into bm_token
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        `USER_ID`,
+      </if>
+      <if test="userAgent != null">
+        `USER_AGENT`,
+      </if>
+      <if test="refreshToken != null">
+        `REFRESH_TOKEN`,
+      </if>
+      <if test="refreshTokenCreateTime != null">
+        `REFRESH_TOKEN_CREATE_TIME`,
+      </if>
+      <if test="refreshTokenExpireTime != null">
+        `REFRESH_TOKEN_EXPIRE_TIME`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="userAgent != null">
+        #{userAgent,jdbcType=VARCHAR},
+      </if>
+      <if test="refreshToken != null">
+        #{refreshToken,jdbcType=VARCHAR},
+      </if>
+      <if test="refreshTokenCreateTime != null">
+        #{refreshTokenCreateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="refreshTokenExpireTime != null">
+        #{refreshTokenExpireTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ew.udm.models.user.UserToken">
+    update bm_token
+    <set>
+      <if test="userId != null">
+        `USER_ID` = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="userAgent != null">
+        `USER_AGENT` = #{userAgent,jdbcType=VARCHAR},
+      </if>
+      <if test="refreshToken != null">
+        `REFRESH_TOKEN` = #{refreshToken,jdbcType=VARCHAR},
+      </if>
+      <if test="refreshTokenCreateTime != null">
+        `REFRESH_TOKEN_CREATE_TIME` = #{refreshTokenCreateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="refreshTokenExpireTime != null">
+        `REFRESH_TOKEN_EXPIRE_TIME` = #{refreshTokenExpireTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where `ID` = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ew.udm.models.user.UserToken">
+    update bm_token
+    set `USER_ID` = #{userId,jdbcType=INTEGER},
+      `USER_AGENT` = #{userAgent,jdbcType=VARCHAR},
+      `REFRESH_TOKEN` = #{refreshToken,jdbcType=VARCHAR},
+      `REFRESH_TOKEN_CREATE_TIME` = #{refreshTokenCreateTime,jdbcType=TIMESTAMP},
+      `REFRESH_TOKEN_EXPIRE_TIME` = #{refreshTokenExpireTime,jdbcType=TIMESTAMP}
+    where `ID` = #{id,jdbcType=INTEGER}
+  </update>
+
+  <cache></cache>
+</mapper>

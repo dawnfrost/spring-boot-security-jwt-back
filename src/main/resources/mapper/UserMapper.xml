@@ -64,6 +64,12 @@
     <select id="countOfPhone" parameterType="java.lang.String" resultType="java.lang.Integer">
         SELECT COUNT(`ID`) FROM `bm_user` WHERE `user_name`=#{phone,jdbcType=VARCHAR}
     </select>
+    <select id="selectByUsername" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `bm_user`
+        where `USER_NAME` = #{username,jdbcType=VARCHAR}
+    </select>
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>

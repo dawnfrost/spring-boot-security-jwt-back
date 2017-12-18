@@ -41,7 +41,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith(tokenHead)) {
             final String authToken = authHeader.substring(tokenHead.length()); // The part after "Bearer "
             String username = jwtTokenUtil.getUsernameFromToken(authToken);
-            logger.info("checking authentication " + username);
+            logger.info("检查权限-" + username);
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 if (jwtTokenUtil.validateToken(authToken)) {
                     UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
