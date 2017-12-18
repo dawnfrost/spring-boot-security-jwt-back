@@ -1,18 +1,27 @@
 package com.ew.udm.service.user;
 import com.ew.udm.models.user.User;
 import com.ew.udm.models.user.UserToken;
+import com.ew.udm.models.user.UserWithRole;
 import com.ew.udm.service.mapper.UserTokenMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.Serializable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 @Component
@@ -40,6 +49,38 @@ public class JwtTokenUtil implements Serializable {
 
     private static String generateUUID() {
         return UUID.randomUUID().toString();
+    }
+
+    public SecretKey generateKey(String userName, String userAgent) {
+        SecretKey key = null;
+        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("SHA-1");
+            String jwtSecret = userName + this.secret + userAgent;
+            byte[] encodedKey = md.digest(jwtSecret.getBytes());
+            key = new SecretKeySpec(encodedKey, signatureAlgorithm.getJcaName());
+        } catch (NoSuchAlgorithmException e) {
+            logger.error(e.getMessage() + " in function generateKey(" + userAgent + ")");
+        }
+
+        return key;
+    }
+
+    private String getRawUsername(final String token) {
+        String[] parts = token.split("\\.");
+        if (parts.length == 3) {
+            byte[] base64decodedBytes = Base64.getDecoder().decode(parts[1]);
+            try {
+                String decoded = new String(base64decodedBytes, "utf-8");
+                JSONObject jsonObject = new JSONObject(decoded);
+                return jsonObject.getString("sub");
+            } catch (UnsupportedEncodingException e) {
+                logger.error(e.getMessage() + " in function getRawUsername(" + token + ")");
+            }
+        }
+
+        return "";
     }
 
     private UserToken generateUserRefreshToken(int userId, String userAgent, int expireDays) {
@@ -72,33 +113,45 @@ public class JwtTokenUtil implements Serializable {
         return token;
     }
 
-    public String generateAccessToken(UserToken userToken, JwtUser user) {
+    public String generateNewToken(UserWithRole user, int expireDays, String userAgent) {
+        UserToken refreshToken = generateUserRefreshToken(user.getId(), userAgent, expireDays);
         Date now = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);
         calendar.add(Calendar.SECOND, expiration);
         Date expires = calendar.getTime();
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(CLAIM_KEY_USERNAME, user.getUsername());
-        claims.put(CLAIM_KEY_CREATED, now);
-        claims.put(USER_EXPIRE_DATE, user.getExpireTime());
+
+        JwtToken token = new JwtToken(user.getId(),
+                user.getUserName(), now, expires,
+                refreshToken.getRefreshTokenExpireTime(), user.getExpireTime(), user.getRoles());
+
         return Jwts.builder()
-                .setClaims(claims)
+                .setClaims(token.toClaims())
                 .setExpiration(expires)
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .signWith(SignatureAlgorithm.HS512, generateKey(user.getUserName(), userAgent))
                 .compact();
     }
 
-    public String getUsernameFromToken(final String token) {
-        Claims claims = getClaimsFromToken(token);
-        if (claims != null) {
-            return claims.getSubject();
+    public JwtToken parseToken(String token, String userAgent) {
+        String userName = getRawUsername(token);
+        if (userName.isEmpty()) {
+            return null;
+        }
+
+        try {
+            Claims claims = Jwts.parser().setSigningKey(generateKey(userName, userAgent)).parseClaimsJws(token).getBody();
+            return new JwtToken(claims);
+        } catch (Exception e) {
+            logger.error(e.getMessage() + " in function parseToken(" + token + ", " + userAgent + ")");
         }
 
         return null;
     }
 
-    private String getUsernameFromToken(final Claims claims) {
+    public String getUsernameFromToken(final String token) {
+        return getClaimsFromToken(token).getSubject();
+    }
+    public String getUsernameFromToken(final Claims claims) {
         return claims.getSubject();
     }
 
@@ -135,23 +188,6 @@ public class JwtTokenUtil implements Serializable {
         return expiration.before(new Date());
     }
 
-    public String generateNewToken(User user, int expireDays, String userAgent) {
-        UserToken refreshToken = generateUserRefreshToken(user.getId(), userAgent, expireDays);
-        Date now = new Date();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(now);
-        calendar.add(Calendar.SECOND, expiration);
-        Date expires = calendar.getTime();
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(CLAIM_KEY_USERNAME, user.getUserName());
-        claims.put(CLAIM_KEY_CREATED, new Date());
-        claims.put(USER_EXPIRE_DATE, user.getExpireTime());
-        return Jwts.builder()
-                .setClaims(claims)
-                .setExpiration(expires)
-                .signWith(SignatureAlgorithm.HS512, secret)
-                .compact();
-    }
 
 
     public boolean canTokenBeRefreshed(final String token) {

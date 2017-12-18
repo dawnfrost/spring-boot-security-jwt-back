@@ -1,5 +1,7 @@
 package com.ew.udm.configs;
 
+import com.ew.udm.service.user.ExpireType;
+import com.ew.udm.service.user.JwtToken;
 import com.ew.udm.service.user.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,35 +21,29 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
-
-    @Autowired
-    private UserDetailsService userDetailsService;
-
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
     @Value("${jwt.header}")
     private String tokenHeader;
 
+    @Value("${jwt.device}")
+    private String userAgentHeader;
+
     @Value("${jwt.tokenHead}")
     private String tokenHead;
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         String authHeader = request.getHeader(this.tokenHeader);
         if (authHeader != null && authHeader.startsWith(tokenHead)) {
-            final String authToken = authHeader.substring(tokenHead.length()); // The part after "Bearer "
-            String username = jwtTokenUtil.getUsernameFromToken(authToken);
-            logger.info("检查权限-" + username);
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                if (jwtTokenUtil.validateToken(authToken)) {
-                    UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            final String token = authHeader.substring(tokenHead.length()); // The part after "Bearer "
+            final String userAgent = request.getHeader(userAgentHeader);
+            JwtToken jwtToken = jwtTokenUtil.parseToken(token, userAgent);
+            if (jwtToken != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (jwtToken.checkExpire() == ExpireType.NONE) {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(jwtToken, null, jwtToken.getRolesAuthority());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    logger.info("authenticated user " + username + ", setting security context");
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }

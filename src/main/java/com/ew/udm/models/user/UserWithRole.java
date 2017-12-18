@@ -1,9 +1,14 @@
 package com.ew.udm.models.user;
 
+import com.google.common.collect.Lists;
+
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class UserWithRole {
+public class UserWithRole implements Serializable {
+    private static final long serialVersionUID = 1;
+
     private Integer id;
     private String userName;
     private String password;
@@ -20,6 +25,14 @@ public class UserWithRole {
     private List<Role> roleList;
 
     public UserWithRole() {
+    }
+
+    public List<String> getRoles() {
+        List<String> roleTags = Lists.newArrayListWithCapacity(roleList.size());
+        for (Role role : roleList) {
+            roleTags.add(role.getRole());
+        }
+        return roleTags;
     }
 
     public Integer getId() {

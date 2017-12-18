@@ -2,6 +2,7 @@ package com.ew.udm.service.user;
 
 import com.ew.udm.models.user.User;
 import com.ew.udm.models.user.UserGroup;
+import com.ew.udm.models.user.UserWithRole;
 import com.ew.udm.service.mapper.UserGroupMapper;
 import com.ew.udm.service.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
         UsernamePasswordAuthenticationToken upToken = new UsernamePasswordAuthenticationToken(username, password);
         final Authentication authentication = authenticationManager.authenticate(upToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        User user = userMapper.selectByUsername(username);
+        UserWithRole user = userMapper.selectUserRoleCollection(username);
         return jwtTokenUtil.generateNewToken(user, expireDays, userAgent);
     }
 

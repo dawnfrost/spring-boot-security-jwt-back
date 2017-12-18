@@ -1,6 +1,10 @@
 package com.ew.udm.models.user;
 
-public class Auth {
+import java.io.Serializable;
+
+public class Auth implements Serializable {
+    private static final long serialVersionUID = 1;
+
     private Integer id;
 
     private Integer order;

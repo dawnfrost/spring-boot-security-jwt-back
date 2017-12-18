@@ -1,8 +1,11 @@
 package com.ew.udm.models.user;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class User {
+public class User implements Serializable {
+    private static final long serialVersionUID = 1;
+
     private Integer id;
 
     private String userName;
