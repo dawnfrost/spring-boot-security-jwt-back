@@ -18,7 +18,7 @@ public class User implements Serializable {
 
     private String displayName;
 
-    private String description;
+    private String markCode;
 
     private Date createTime;
 
@@ -80,12 +80,12 @@ public class User implements Serializable {
         this.displayName = displayName == null ? null : displayName.trim();
     }
 
-    public String getDescription() {
-        return description;
+    public String getMarkCode() {
+        return markCode;
     }
 
-    public void setDescription(String description) {
-        this.description = description == null ? null : description.trim();
+    public void setMarkCode(String markCode) {
+        this.markCode = markCode == null ? null : markCode.trim();
     }
 
     public Date getCreateTime() {

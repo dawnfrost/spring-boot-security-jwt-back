@@ -5,6 +5,8 @@ server:
       uri-encoding: UTF-8
 #  error:
 #    include-stacktrace: always
+urls:
+  ignoreAuth: /,/*.html,/favicon.ico,/**/*.html,/**/*.css,/**/*.js,/auth/**,/pass/**,/test/**
 jwt:
   secret: a34c0bcc-3e42-4770-925f-85119bc8fe13
   expiration: 7200

@@ -14,9 +14,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.codec.Hex;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 @Service
@@ -76,6 +80,9 @@ public class AuthServiceImpl implements AuthService {
             throw new Exception("手机号已被注册");
         }
 
+        Date now = new Date();
+        userToAdd.setCreateTime(now);
+        userToAdd.setMarkCode(username + userToAdd.getId() + userToAdd.getPassword() + now.toString());
         userMapper.insertSelective(userToAdd);
         UserGroup userGroup = new UserGroup();
         userGroup.setUserId(userToAdd.getId());
@@ -96,10 +103,36 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String refresh(String oldToken) {
         final String token = oldToken.substring(tokenHead.length());
-        if (jwtTokenUtil.canTokenBeRefreshed(token)){
+        if (jwtTokenUtil.canTokenBeRefreshed(token)) {
             return jwtTokenUtil.refreshToken(token);
         }
 
         return null;
+    }
+
+    private static String byte2Hex(byte[] bytes) {
+        StringBuilder stringBuilder = new StringBuilder();
+        String temp = null;
+        for (byte val : bytes) {
+            temp = Integer.toHexString(val & 0xFF);
+            if (temp.length() == 1) {
+                stringBuilder.append("0");
+            }
+            stringBuilder.append(temp);
+        }
+        return stringBuilder.toString();
+    }
+
+    private static String sha256(String str) {
+        MessageDigest messageDigest;
+        try {
+            messageDigest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = messageDigest.digest(str.getBytes("UTF-8"));
+            return byte2Hex(hash);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 }

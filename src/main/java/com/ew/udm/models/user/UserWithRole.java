@@ -15,7 +15,7 @@ public class UserWithRole implements Serializable {
     private String email;
     private String phone;
     private String displayName;
-    private String description;
+    private String markCode;
     private Date createTime;
     private Date lastLoginTime;
     private Byte isEnable;
@@ -83,12 +83,12 @@ public class UserWithRole implements Serializable {
         this.displayName = displayName;
     }
 
-    public String getDescription() {
-        return description;
+    public String getMarkCode() {
+        return markCode;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setMarkCode(String markCode) {
+        this.markCode = markCode;
     }
 
     public Date getCreateTime() {

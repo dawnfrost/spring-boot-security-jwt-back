@@ -22,7 +22,7 @@ public class JwtUser extends User implements UserDetails {
         super.setUserName(userWithRole.getUserName());
         super.setPassword(userWithRole.getPassword());
         super.setCreateTime(userWithRole.getCreateTime());
-        super.setDescription(userWithRole.getDescription());
+        super.setMarkCode(userWithRole.getMarkCode());
         super.setDisplayName(userWithRole.getDisplayName());
         super.setEmail(userWithRole.getEmail());
         super.setExpireTime(userWithRole.getExpireTime());

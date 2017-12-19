@@ -1,8 +1,10 @@
 package com.ew.udm.service.mapper;
 
 import com.ew.udm.models.user.User;
+import com.ew.udm.models.user.UserRoleMin;
 import com.ew.udm.models.user.UserWithRole;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -22,6 +24,9 @@ public interface UserMapper {
 
     UserWithRole selectUserRoleCollection(String userName);
 
+    User selectByMarkCode(String markCode);
+    UserWithRole selectUserRoleCollectionByMarkCode(String markCode);
+
     List<User> selectAll(int pageNum, int pageSize);
 
     int countOfUserName(String userName);
@@ -29,4 +34,8 @@ public interface UserMapper {
     int countOfPhone(String phone);
 
     User selectByUsername(String username);
+
+    UserRoleMin selectUserRoleMinById(@Param("userId") Integer userId);
+    UserRoleMin selectUserRoleMinByName(@Param("userName") String userName);
+    UserRoleMin selectUserRoleMinByMarkCode(@Param("markCode") String markCode);
 }

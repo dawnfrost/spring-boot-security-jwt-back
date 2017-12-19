@@ -8,7 +8,7 @@
         <result column="EMAIL" jdbcType="VARCHAR" property="email"/>
         <result column="PHONE" jdbcType="VARCHAR" property="phone"/>
         <result column="DISPLAY_NAME" jdbcType="VARCHAR" property="displayName"/>
-        <result column="DESCRIPTION" jdbcType="VARCHAR" property="description"/>
+        <result column="MARK_CODE" jdbcType="VARCHAR" property="markCode"/>
         <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="LAST_LOGIN_TIME" jdbcType="TIMESTAMP" property="lastLoginTime"/>
         <result column="IS_ENABLE" jdbcType="TINYINT" property="isEnable"/>
@@ -17,7 +17,7 @@
         <result column="IS_LOCKED" jdbcType="TINYINT" property="isLocked"/>
     </resultMap>
     <sql id="Base_Column_List">
-    `ID`, `USER_NAME`, `PASSWORD`, `EMAIL`, `PHONE`, `DISPLAY_NAME`, `DESCRIPTION`, `CREATE_TIME`, 
+    `ID`, `USER_NAME`, `PASSWORD`, `EMAIL`, `PHONE`, `DISPLAY_NAME`, `MARK_CODE`, `CREATE_TIME`,
     `LAST_LOGIN_TIME`, `IS_ENABLE`, `STATUS`, `EXPIRE_TIME`, `IS_LOCKED`
   </sql>
     <resultMap id="userRoleCollectionMap" type="com.ew.udm.models.user.UserWithRole">
@@ -27,7 +27,7 @@
         <result column="EMAIL" jdbcType="VARCHAR" property="email"/>
         <result column="PHONE" jdbcType="VARCHAR" property="phone"/>
         <result column="DISPLAY_NAME" jdbcType="VARCHAR" property="displayName"/>
-        <result column="DESCRIPTION" jdbcType="VARCHAR" property="description"/>
+        <result column="MARK_CODE" jdbcType="VARCHAR" property="markCode"/>
         <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="LAST_LOGIN_TIME" jdbcType="TIMESTAMP" property="lastLoginTime"/>
         <result column="IS_ENABLE" jdbcType="TINYINT" property="isEnable"/>
@@ -42,18 +42,77 @@
             <result column="ROLE" property="role" jdbcType="VARCHAR"/>
         </collection>
     </resultMap>
-    <select id="selectUserRoleCollection" resultMap="userRoleCollectionMap">
-        SELECT u.`ID` AS `USER_ID`, u.`USER_NAME`, u.`DISPLAY_NAME`, u.`PASSWORD`, r.`ID` AS `ROLE_ID`, r.`name` AS `ROLE_NAME`, r.`ROLE`, u.`CREATE_TIME`, u.`DESCRIPTION`,
+    <resultMap id="userRoleMinMap" type="com.ew.udm.models.user.UserRoleMin">
+        <id column="USER_ID" jdbcType="INTEGER" property="userId"/>
+        <result column="USER_NAME" jdbcType="VARCHAR" property="username"/>
+        <result column="PASSWORD" jdbcType="VARCHAR" property="password"/>
+        <result column="MARK_CODE" jdbcType="VARCHAR" property="markCode"/>
+        <collection property="roles" javaType="java.util.List" ofType="com.ew.udm.models.user.Role">
+            <id column="ROLE_ID" property="id" jdbcType="INTEGER"/>
+            <result column="ROLE_NAME" property="name" jdbcType="VARCHAR"/>
+            <result column="ROLE_DESCRIPTION" property="description" jdbcType="VARCHAR"/>
+            <result column="ROLE_ORDER" property="order" jdbcType="INTEGER"/>
+            <result column="ROLE" property="role" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+    <select id="selectUserRoleCollection" parameterType="java.lang.String" resultMap="userRoleCollectionMap">
+        SELECT u.`ID` AS `USER_ID`, u.`USER_NAME`, u.`DISPLAY_NAME`, u.`PASSWORD`, r.`ID` AS `ROLE_ID`, r.`name` AS `ROLE_NAME`, r.`ROLE`, u.`CREATE_TIME`, u.`MARK_CODE`,
          u.`EMAIL`, u.`EXPIRE_TIME`, u.`IS_ENABLE`, u.`IS_LOCKED`, u.`LAST_LOGIN_TIME`, u.`PHONE`, u.`STATUS`,
          r.`DESCRIPTION` AS `ROLE_DESCRIPTION`, r.`ORDER` AS ROLE_ORDER
         FROM `bm_user` u LEFT JOIN `bm_user_role` ur ON ur.`USER_ID`=u.`id` RIGHT JOIN `bm_role` r ON ur.`ROLE_ID`=r.`ID`
         WHERE u.`user_name`=#{userName,jdbcType=VARCHAR}
         UNION
-        SELECT u.`ID` AS `USER_ID`, u.`USER_NAME`, u.`DISPLAY_NAME`, u.`PASSWORD`, r.`ID` AS `ROLE_ID`, r.`name` AS `ROLE_NAME`, r.`ROLE`, u.`CREATE_TIME`, u.`DESCRIPTION`,
+        SELECT u.`ID` AS `USER_ID`, u.`USER_NAME`, u.`DISPLAY_NAME`, u.`PASSWORD`, r.`ID` AS `ROLE_ID`, r.`name` AS `ROLE_NAME`, r.`ROLE`, u.`CREATE_TIME`, u.`MARK_CODE`,
          u.`EMAIL`, u.`EXPIRE_TIME`, u.`IS_ENABLE`, u.`IS_LOCKED`, u.`LAST_LOGIN_TIME`, u.`PHONE`, u.`STATUS`,
          r.`DESCRIPTION` AS `ROLE_DESCRIPTION`, r.`ORDER` AS ROLE_ORDER
         FROM `bm_user` u LEFT JOIN `bm_user_group` ug ON ug.`USER_ID`=u.`id` RIGHT JOIN `bm_group_role` gr ON ug.`GROUP_ID`=gr.`GROUP_ID` RIGHT JOIN `bm_role` r ON gr.`ROLE_ID`=r.`ID`
         WHERE u.`user_name`=#{userName,jdbcType=VARCHAR} ORDER BY `ROLE_ORDER` ASC
+    </select>
+    <select id="selectUserRoleCollectionByMarkCode" parameterType="java.lang.String" resultMap="userRoleCollectionMap">
+        SELECT u.`ID` AS `USER_ID`, u.`USER_NAME`, u.`DISPLAY_NAME`, u.`PASSWORD`, r.`ID` AS `ROLE_ID`, r.`name` AS `ROLE_NAME`, r.`ROLE`, u.`CREATE_TIME`, u.`MARK_CODE`,
+        u.`EMAIL`, u.`EXPIRE_TIME`, u.`IS_ENABLE`, u.`IS_LOCKED`, u.`LAST_LOGIN_TIME`, u.`PHONE`, u.`STATUS`,
+        r.`DESCRIPTION` AS `ROLE_DESCRIPTION`, r.`ORDER` AS ROLE_ORDER
+        FROM `bm_user` u LEFT JOIN `bm_user_role` ur ON ur.`USER_ID`=u.`id` RIGHT JOIN `bm_role` r ON ur.`ROLE_ID`=r.`ID`
+        WHERE u.`MARK_CODE`=#{markCode,jdbcType=VARCHAR}
+        UNION
+        SELECT u.`ID` AS `USER_ID`, u.`USER_NAME`, u.`DISPLAY_NAME`, u.`PASSWORD`, r.`ID` AS `ROLE_ID`, r.`name` AS `ROLE_NAME`, r.`ROLE`, u.`CREATE_TIME`, u.`MARK_CODE`,
+        u.`EMAIL`, u.`EXPIRE_TIME`, u.`IS_ENABLE`, u.`IS_LOCKED`, u.`LAST_LOGIN_TIME`, u.`PHONE`, u.`STATUS`,
+        r.`DESCRIPTION` AS `ROLE_DESCRIPTION`, r.`ORDER` AS ROLE_ORDER
+        FROM `bm_user` u LEFT JOIN `bm_user_group` ug ON ug.`USER_ID`=u.`id` RIGHT JOIN `bm_group_role` gr ON ug.`GROUP_ID`=gr.`GROUP_ID` RIGHT JOIN `bm_role` r ON gr.`ROLE_ID`=r.`ID`
+        WHERE u.`MARK_CODE`=#{markCode,jdbcType=VARCHAR} ORDER BY `ROLE_ORDER` ASC
+    </select>
+    <select id="selectUserRoleMinById" parameterType="java.lang.Integer" resultMap="userRoleMinMap">
+        SELECT u.`ID` AS `USER_ID`, u.`USER_NAME`, u.`PASSWORD`, u.`MARK_CODE`,
+		  r.`ID` AS `ROLE_ID`, r.`NAME` as `ROLE_NAME`, r.`ORDER` as `ROLE_ORDER`, r.`DESCRIPTION` as `ROLE_DESCRIPTION`, r.`ROLE`
+        FROM `bm_user` u LEFT JOIN `bm_user_role` ur ON ur.`USER_ID`=u.`id` RIGHT JOIN `bm_role` r ON ur.`ROLE_ID`=r.`ID`
+        WHERE `USER_ID`=#{userId,jdbcType=INTEGER}
+        UNION
+        SELECT u.`ID` AS `USER_ID`, u.`USER_NAME`, u.`PASSWORD`, u.`MARK_CODE`,
+		  r.`ID` AS `ROLE_ID`, r.`NAME` as `ROLE_NAME`, r.`ORDER` as `ROLE_ORDER`, r.`DESCRIPTION` as `ROLE_DESCRIPTION`, r.`ROLE`
+        FROM `bm_user` u LEFT JOIN `bm_user_group` ug ON ug.`USER_ID`=u.`id` RIGHT JOIN `bm_group_role` gr ON ug.`GROUP_ID`=gr.`GROUP_ID` RIGHT JOIN `bm_role` r ON gr.`ROLE_ID`=r.`ID`
+        WHERE `USER_ID`=#{userId,jdbcType=INTEGER} ORDER BY `ROLE_ORDER` ASC
+    </select>
+    <select id="selectUserRoleMinByName" parameterType="java.lang.String" resultMap="userRoleMinMap">
+        SELECT u.`ID` AS `USER_ID`, u.`USER_NAME`, u.`PASSWORD`, u.`MARK_CODE`,
+        r.`ID` AS `ROLE_ID`, r.`NAME` as `ROLE_NAME`, r.`ORDER` as `ROLE_ORDER`, r.`DESCRIPTION` as `ROLE_DESCRIPTION`, r.`ROLE`
+        FROM `bm_user` u LEFT JOIN `bm_user_role` ur ON ur.`USER_ID`=u.`id` RIGHT JOIN `bm_role` r ON ur.`ROLE_ID`=r.`ID`
+        WHERE u.`USER_NAME`=#{userName,jdbcType=VARCHAR}
+        UNION
+        SELECT u.`ID` AS `USER_ID`, u.`USER_NAME`, u.`PASSWORD`, u.`MARK_CODE`,
+        r.`ID` AS `ROLE_ID`, r.`NAME` as `ROLE_NAME`, r.`ORDER` as `ROLE_ORDER`, r.`DESCRIPTION` as `ROLE_DESCRIPTION`, r.`ROLE`
+        FROM `bm_user` u LEFT JOIN `bm_user_group` ug ON ug.`USER_ID`=u.`id` RIGHT JOIN `bm_group_role` gr ON ug.`GROUP_ID`=gr.`GROUP_ID` RIGHT JOIN `bm_role` r ON gr.`ROLE_ID`=r.`ID`
+        WHERE u.`USER_NAME`=#{userName,jdbcType=VARCHAR} ORDER BY `ROLE_ORDER` ASC
+    </select>
+    <select id="selectUserRoleMinByMarkCode" parameterType="java.lang.String" resultMap="userRoleMinMap">
+        SELECT u.`ID` AS `USER_ID`, u.`USER_NAME`, u.`PASSWORD`, u.`MARK_CODE`,
+		  r.`ID` AS `ROLE_ID`, r.`NAME` as `ROLE_NAME`, r.`ORDER` as `ROLE_ORDER`, r.`DESCRIPTION` as `ROLE_DESCRIPTION`, r.`ROLE`
+        FROM `bm_user` u LEFT JOIN `bm_user_role` ur ON ur.`USER_ID`=u.`id` RIGHT JOIN `bm_role` r ON ur.`ROLE_ID`=r.`ID`
+        WHERE u.`MARK_CODE`=#{markCode,jdbcType=VARCHAR}
+        UNION
+        SELECT u.`ID` AS `USER_ID`, u.`USER_NAME`, u.`PASSWORD`, u.`MARK_CODE`,
+		  r.`ID` AS `ROLE_ID`, r.`NAME` as `ROLE_NAME`, r.`ORDER` as `ROLE_ORDER`, r.`DESCRIPTION` as `ROLE_DESCRIPTION`, r.`ROLE`
+        FROM `bm_user` u LEFT JOIN `bm_user_group` ug ON ug.`USER_ID`=u.`id` RIGHT JOIN `bm_group_role` gr ON ug.`GROUP_ID`=gr.`GROUP_ID` RIGHT JOIN `bm_role` r ON gr.`ROLE_ID`=r.`ID`
+        WHERE u.`MARK_CODE`=#{markCode,jdbcType=VARCHAR} ORDER BY `ROLE_ORDER` ASC
     </select>
     <select id="countOfUserName" parameterType="java.lang.String" resultType="java.lang.Integer">
         SELECT COUNT(`ID`) FROM `bm_user` WHERE `user_name`=#{userName,jdbcType=VARCHAR}
@@ -76,6 +135,12 @@
         from `bm_user`
         where `ID` = #{id,jdbcType=INTEGER}
     </select>
+    <select id="selectByMarkCode" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `bm_user`
+        where `MARK_CODE` = #{markCode,jdbcType=VARCHAR}
+    </select>
     <select id="selectAll" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
@@ -88,12 +153,12 @@
     <insert id="insert" keyColumn="ID" keyProperty="id" parameterType="com.ew.udm.models.user.User"
             useGeneratedKeys="true">
     insert into bm_user (`USER_NAME`, `PASSWORD`, `EMAIL`, 
-      `PHONE`, `DISPLAY_NAME`, `DESCRIPTION`, 
+      `PHONE`, `DISPLAY_NAME`, `MARK_CODE`,
       `CREATE_TIME`, `LAST_LOGIN_TIME`, `IS_ENABLE`, 
       `STATUS`, `EXPIRE_TIME`, `IS_LOCKED`
       )
     values (#{userName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
-      #{phone,jdbcType=VARCHAR}, #{displayName,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
+      #{phone,jdbcType=VARCHAR}, #{displayName,jdbcType=VARCHAR}, #{markCode,jdbcType=VARCHAR},
       #{createTime,jdbcType=TIMESTAMP}, #{lastLoginTime,jdbcType=TIMESTAMP}, #{isEnable,jdbcType=TINYINT}, 
       #{status,jdbcType=INTEGER}, #{expireTime,jdbcType=TIMESTAMP}, #{isLocked,jdbcType=TINYINT}
       )
@@ -117,8 +182,8 @@
             <if test="displayName != null">
                 `DISPLAY_NAME`,
             </if>
-            <if test="description != null">
-                `DESCRIPTION`,
+            <if test="markCode != null">
+                `MARK_CODE`,
             </if>
             <if test="createTime != null">
                 `CREATE_TIME`,
@@ -155,8 +220,8 @@
             <if test="displayName != null">
                 #{displayName,jdbcType=VARCHAR},
             </if>
-            <if test="description != null">
-                #{description,jdbcType=VARCHAR},
+            <if test="markCode != null">
+                #{markCode,jdbcType=VARCHAR},
             </if>
             <if test="createTime != null">
                 #{createTime,jdbcType=TIMESTAMP},
@@ -196,8 +261,8 @@
             <if test="displayName != null">
                 `DISPLAY_NAME` = #{displayName,jdbcType=VARCHAR},
             </if>
-            <if test="description != null">
-                `DESCRIPTION` = #{description,jdbcType=VARCHAR},
+            <if test="markCode != null">
+                `MARK_CODE` = #{markCode,jdbcType=VARCHAR},
             </if>
             <if test="createTime != null">
                 `CREATE_TIME` = #{createTime,jdbcType=TIMESTAMP},
@@ -227,7 +292,7 @@
       `EMAIL` = #{email,jdbcType=VARCHAR},
       `PHONE` = #{phone,jdbcType=VARCHAR},
       `DISPLAY_NAME` = #{displayName,jdbcType=VARCHAR},
-      `DESCRIPTION` = #{description,jdbcType=VARCHAR},
+      `MARK_CODE` = #{markCode,jdbcType=VARCHAR},
       `CREATE_TIME` = #{createTime,jdbcType=TIMESTAMP},
       `LAST_LOGIN_TIME` = #{lastLoginTime,jdbcType=TIMESTAMP},
       `IS_ENABLE` = #{isEnable,jdbcType=TINYINT},
@@ -236,4 +301,5 @@
       `IS_LOCKED` = #{isLocked,jdbcType=TINYINT}
     where `ID` = #{id,jdbcType=INTEGER}
   </update>
+    <cache eviction="LRU" flushInterval="60000" size="512" readOnly="true"></cache>
 </mapper>

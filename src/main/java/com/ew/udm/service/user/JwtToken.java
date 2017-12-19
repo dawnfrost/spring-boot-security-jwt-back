@@ -2,8 +2,10 @@ package com.ew.udm.service.user;
 
 import com.google.common.collect.Maps;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.lang.Collections;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -16,87 +18,44 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class JwtToken {
-    private int uid;
     private String sub;
     private Date created;
     private Date tokenExp;
     private Date sessionExp;
     private Date userExp;
-    private Date exp;
-    private String[] roles;
 
-    public JwtToken(int uid, String sub, Date created, Date tokenExp, Date sessionExp, Date userExp, List<String> roles) {
-        this.uid = uid;
+    public JwtToken(String sub, Date created, Date tokenExp, Date sessionExp, Date userExp) {
         this.sub = sub;
         this.created = created;
         this.tokenExp = tokenExp;
         this.sessionExp = sessionExp;
         this.userExp = userExp;
-        if (roles != null && !roles.isEmpty()) {
-            this.roles = new String[roles.size()];
-            roles.toArray(this.roles);
-        }
     }
 
     public JwtToken(Claims claims) {
-        Field[] fields = this.getClass().getDeclaredFields();
-        try {
-            for (Field field : fields) {
-                if (field.getName().equals("exp")) {
-                    continue;
-                }
-
-                Method method = JwtToken.class.getMethod("set" + StringUtils.capitalize(field.getName()), field.getType());
-                if (field.getType() == Date.class) {
-                    method.invoke(this, new Date((long) claims.get(field.getName())));
-                } else if (field.getType() == int.class) {
-                    method.invoke(this, (int)claims.get(field.getName()));
-                } else if (field.getType() == long.class) {
-                    method.invoke(this, (long)claims.get(field.getName()));
-                } else if (field.getType() == String.class) {
-                    method.invoke(this, claims.get(field.getName()));
-                }
-            }
-
-            List list = (List)claims.get("roles");
-            if (list != null && !list.isEmpty()) {
-                String[] array = new String[list.size()];
-                list.toArray(array);
-                this.setRoles(array);
-            }
-
-            this.exp = claims.getExpiration();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.sub = claims.getSubject();
+        this.created = claims.getIssuedAt();
+        this.tokenExp = claims.getExpiration();
+        this.sessionExp = claims.get("exp2", Date.class);
+        this.userExp = claims.get("exp3", Date.class);
     }
 
-    public Map<String, Object> toClaims() {
-        Map<String, Object> ret = Maps.newHashMap();
-        Field[] fields = this.getClass().getDeclaredFields();
-        try {
-            for (Field field : fields) {
-                Method method = JwtToken.class.getMethod("get" + StringUtils.capitalize(field.getName()));
-                ret.put(field.getName(), method.invoke(this));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public JwtBuilder getBuilder() {
+        JwtBuilder builder = Jwts.builder();
+        builder.setIssuedAt(this.getCreated());
+        builder.setExpiration(this.getTokenExp());
+        builder.setSubject(this.getSub());
 
-        return ret;
-    }
+        Map<String, Object> claims = Maps.newHashMap();
+        claims.put("exp2", this.getSessionExp());
+        claims.put("exp3", this.getUserExp());
+        builder.addClaims(claims);
 
-    public List<GrantedAuthority> getRolesAuthority() {
-        if (this.roles != null) {
-            List<String> authorities = Collections.arrayToList(this.roles);
-            return authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-        }
-
-        return null;
+        return builder;
     }
 
     private boolean isTokenExpired(Date date) {
-        return this.exp.before(date);
+        return this.tokenExp.before(date);
     }
 
     private boolean isUserExpired(Date date) {
@@ -122,18 +81,6 @@ public class JwtToken {
         }
 
         return ExpireType.NONE;
-    }
-
-    public int getUid() {
-        return uid;
-    }
-
-    public void setUid(int uid) {
-        this.uid = uid;
-    }
-
-    public int getUserId() {
-        return this.uid;
     }
 
     public String getUserName() {
@@ -180,19 +127,4 @@ public class JwtToken {
         this.userExp = userExp;
     }
 
-    public Date getExp() {
-        return exp;
-    }
-
-    public void setExp(Date exp) {
-        this.exp = exp;
-    }
-
-    public String[] getRoles() {
-        return roles;
-    }
-
-    public void setRoles(String[] roles) {
-        this.roles = roles;
-    }
 }
