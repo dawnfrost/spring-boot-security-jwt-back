@@ -105,7 +105,7 @@ public class JwtTokenUtil implements Serializable {
         calendar.add(Calendar.SECOND, expiration);
         Date expires = calendar.getTime();
         SecretKey key = generateKey(userAgent);
-        JwtToken token = new JwtToken(user.getUserName(), now, expires, refreshToken.getRefreshTokenExpireTime(), user.getExpireTime());
+        JwtToken token = new JwtToken(user, now, expires, refreshToken.getRefreshTokenExpireTime(), user.getExpireTime());
         return token.getBuilder().signWith(SignatureAlgorithm.HS512, key).compact();
     }
 

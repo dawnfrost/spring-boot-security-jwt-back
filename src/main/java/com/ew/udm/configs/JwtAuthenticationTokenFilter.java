@@ -60,8 +60,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             if (jwtToken != null && context.getAuthentication() == null) {
                 ExpireType expireType = jwtToken.checkExpire();
                 if (expireType == ExpireType.NONE) {
-                    UserRoleMin user = userMapper.selectUserRoleMinByName(jwtToken.getSub());
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(jwtToken.getSub(), null, jwtToken.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     context.setAuthentication(authentication);
                 } else {

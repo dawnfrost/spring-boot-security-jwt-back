@@ -1,5 +1,8 @@
 package com.ew.udm.service.user;
 
+import com.ew.udm.models.user.Role;
+import com.ew.udm.models.user.UserWithRole;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
@@ -11,10 +14,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class JwtToken {
@@ -23,13 +23,15 @@ public class JwtToken {
     private Date tokenExp;
     private Date sessionExp;
     private Date userExp;
+    private List<String> roles;
 
-    public JwtToken(String sub, Date created, Date tokenExp, Date sessionExp, Date userExp) {
-        this.sub = sub;
+    public JwtToken(UserWithRole user, Date created, Date tokenExp, Date sessionExp, Date userExp) {
+        this.sub = user.getUserName();
         this.created = created;
         this.tokenExp = tokenExp;
         this.sessionExp = sessionExp;
         this.userExp = userExp;
+        this.roles = user.getRoles();
     }
 
     public JwtToken(Claims claims) {
@@ -38,6 +40,12 @@ public class JwtToken {
         this.tokenExp = claims.getExpiration();
         this.sessionExp = claims.get("exp2", Date.class);
         this.userExp = claims.get("exp3", Date.class);
+        if (claims.containsKey("roles")) {
+            List roles = claims.get("roles", List.class);
+            this.roles = (List<String>)roles.stream().map(x -> "ROLE_" + x).collect(Collectors.toList());
+        } else {
+            this.roles = new ArrayList<>();
+        }
     }
 
     public JwtBuilder getBuilder() {
@@ -49,9 +57,18 @@ public class JwtToken {
         Map<String, Object> claims = Maps.newHashMap();
         claims.put("exp2", this.getSessionExp());
         claims.put("exp3", this.getUserExp());
-        builder.addClaims(claims);
+        claims.put("roles", this.roles.stream().map(x -> x.substring(5)).collect(Collectors.toList()));
 
+        builder.addClaims(claims);
         return builder;
+    }
+
+    public List<GrantedAuthority> getAuthorities() {
+        if (this.roles != null && !this.roles.isEmpty()) {
+            return this.roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     private boolean isTokenExpired(Date date) {
@@ -127,4 +144,11 @@ public class JwtToken {
         this.userExp = userExp;
     }
 
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
 }
