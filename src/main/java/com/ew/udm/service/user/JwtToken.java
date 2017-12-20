@@ -1,5 +1,6 @@
 package com.ew.udm.service.user;
 
+import com.ew.udm.configs.AuthenticationStatus;
 import com.ew.udm.models.user.Role;
 import com.ew.udm.models.user.UserWithRole;
 import com.google.common.collect.Lists;
@@ -83,21 +84,21 @@ public class JwtToken {
         return this.sessionExp.before(date);
     }
 
-    public ExpireType checkExpire() {
+    public AuthenticationStatus checkExpire() {
         Date now = new Date();
         if (isTokenExpired(now)) {
-            return ExpireType.TOKEN_EXPIRE;
+            return AuthenticationStatus.TOKEN_EXPIRE;
         }
 
         if (isSessionExpired(now)) {
-            return ExpireType.SESSION_EXPIRE;
+            return AuthenticationStatus.SESSION_EXPIRE;
         }
 
         if (isUserExpired(now)) {
-            return ExpireType.USER_EXPIRE;
+            return AuthenticationStatus.USER_EXPIRE;
         }
 
-        return ExpireType.NONE;
+        return AuthenticationStatus.SUCCESS;
     }
 
     public String getUserName() {

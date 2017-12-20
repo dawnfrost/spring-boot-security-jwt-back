@@ -1,13 +1,10 @@
 package com.ew.udm.configs;
 
-import com.ew.udm.service.mapper.UserMapper;
 import com.ew.udm.service.user.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -22,25 +19,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    private final UserDetailsService userDetailsService;
     private final JwtTokenUtil jwtTokenUtil;
     @Value("${urls.ignoreAuth}")
     private String[] ignoreUrls;
 
     @Autowired
-    public WebSecurityConfig(UserDetailsService userDetailsService, JwtTokenUtil jwtTokenUtil) {
-        this.userDetailsService = userDetailsService;
+    public WebSecurityConfig(JwtTokenUtil jwtTokenUtil) {
         this.jwtTokenUtil = jwtTokenUtil;
-    }
-
-    @Autowired
-    public void configureAuthentication(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder.userDetailsService(this.userDetailsService);
     }
 
     @Bean
     public JwtAuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
-        return new JwtAuthenticationTokenFilter(jwtTokenUtil, userDetailsService);
+        return new JwtAuthenticationTokenFilter(jwtTokenUtil);
     }
 
     @Override

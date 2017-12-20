@@ -1,5 +1,6 @@
 package com.ew.udm.service.user;
-import com.ew.udm.models.user.User;
+
+import com.ew.udm.configs.JwtHeaderConfig;
 import com.ew.udm.models.user.UserToken;
 import com.ew.udm.models.user.UserWithRole;
 import com.ew.udm.service.mapper.UserTokenMapper;
@@ -8,13 +9,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Base64;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -40,10 +37,13 @@ public class JwtTokenUtil implements Serializable {
     @Value("${jwt.expiration}")
     private int expiration;
 
+    private final JwtHeaderConfig jwtHeaderConfig;
+
     private final UserTokenMapper userTokenMapper;
 
     @Autowired
-    public JwtTokenUtil(UserTokenMapper userTokenMapper) {
+    public JwtTokenUtil(JwtHeaderConfig jwtHeaderConfig, UserTokenMapper userTokenMapper) {
+        this.jwtHeaderConfig = jwtHeaderConfig;
         this.userTokenMapper = userTokenMapper;
     }
 
@@ -97,6 +97,10 @@ public class JwtTokenUtil implements Serializable {
         return token;
     }
 
+    public JwtHeaderConfig getJwtHeaderConfig() {
+        return jwtHeaderConfig;
+    }
+
     public String generateNewToken(UserWithRole user, int expireDays, String userAgent) {
         UserToken refreshToken = generateUserRefreshToken(user.getId(), userAgent, expireDays);
         Date now = new Date();
@@ -110,19 +114,14 @@ public class JwtTokenUtil implements Serializable {
     }
 
     public JwtToken parseToken(String token, String userAgent) {
-        try {
-            Claims claims = Jwts.parser().setSigningKey(generateKey(userAgent)).parseClaimsJws(token).getBody();
-            return new JwtToken(claims);
-        } catch (Exception e) {
-            logger.error(e.getMessage() + " in function parseToken(" + token + ", " + userAgent + ")");
-        }
-
-        return null;
+        Claims claims = Jwts.parser().setSigningKey(generateKey(userAgent)).parseClaimsJws(token).getBody();
+        return new JwtToken(claims);
     }
 
     public String getUsernameFromToken(final String token) {
         return getClaimsFromToken(token).getSubject();
     }
+
     public String getUsernameFromToken(final Claims claims) {
         return claims.getSubject();
     }
@@ -159,7 +158,6 @@ public class JwtTokenUtil implements Serializable {
         final Date expiration = getUserExpireDateFromToken(claims);
         return expiration.before(new Date());
     }
-
 
 
     public boolean canTokenBeRefreshed(final String token) {
