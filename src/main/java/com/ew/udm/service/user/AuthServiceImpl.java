@@ -1,5 +1,7 @@
 package com.ew.udm.service.user;
 
+import com.ew.udm.controller.req.AuthRequest;
+import com.ew.udm.controller.res.LoginResponse;
 import com.ew.udm.models.user.User;
 import com.ew.udm.models.user.UserGroup;
 import com.ew.udm.models.user.UserWithRole;
@@ -92,12 +94,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login(String username, String password, int expireDays, String userAgent) {
-        UsernamePasswordAuthenticationToken upToken = new UsernamePasswordAuthenticationToken(username, password);
+    public LoginResponse login(AuthRequest authRequest) {
+        UsernamePasswordAuthenticationToken upToken = new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword());
         final Authentication authentication = authenticationManager.authenticate(upToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserWithRole user = userMapper.selectUserRoleCollection(username);
-        return jwtTokenUtil.generateNewToken(user, expireDays, userAgent);
+        UserWithRole user = userMapper.selectUserRoleCollection(authRequest.getUsername());
+        return jwtTokenUtil.generateNewToken(user, authRequest);
     }
 
     @Override

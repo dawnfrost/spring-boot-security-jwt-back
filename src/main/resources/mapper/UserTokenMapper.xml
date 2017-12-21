@@ -5,12 +5,13 @@
     <id column="ID" jdbcType="INTEGER" property="id" />
     <result column="USER_ID" jdbcType="INTEGER" property="userId" />
     <result column="USER_AGENT" jdbcType="VARCHAR" property="userAgent" />
+    <result column="REMOTE_HOST" jdbcType="VARCHAR" property="remoteHost" />
     <result column="REFRESH_TOKEN" jdbcType="VARCHAR" property="refreshToken" />
     <result column="REFRESH_TOKEN_CREATE_TIME" jdbcType="TIMESTAMP" property="refreshTokenCreateTime" />
     <result column="REFRESH_TOKEN_EXPIRE_TIME" jdbcType="TIMESTAMP" property="refreshTokenExpireTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    `ID`, `USER_ID`, `USER_AGENT`, `REFRESH_TOKEN`, `REFRESH_TOKEN_CREATE_TIME`, `REFRESH_TOKEN_EXPIRE_TIME`
+    `ID`, `USER_ID`, `USER_AGENT`, `REMOTE_HOST`, `REFRESH_TOKEN`, `REFRESH_TOKEN_CREATE_TIME`, `REFRESH_TOKEN_EXPIRE_TIME`
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -35,10 +36,10 @@
     where `ID` = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" keyColumn="ID" keyProperty="id" parameterType="com.ew.udm.models.user.UserToken" useGeneratedKeys="true">
-    insert into bm_token (`USER_ID`, `USER_AGENT`, `REFRESH_TOKEN`, 
+    insert into bm_token (`USER_ID`, `USER_AGENT`, `REMOTE_HOST`, `REFRESH_TOKEN`,
       `REFRESH_TOKEN_CREATE_TIME`, `REFRESH_TOKEN_EXPIRE_TIME`
       )
-    values (#{userId,jdbcType=INTEGER}, #{userAgent,jdbcType=VARCHAR}, #{refreshToken,jdbcType=VARCHAR}, 
+    values (#{userId,jdbcType=INTEGER}, #{userAgent,jdbcType=VARCHAR}, #{remoteHost,jdbcType=VARCHAR}, #{refreshToken,jdbcType=VARCHAR},
       #{refreshTokenCreateTime,jdbcType=TIMESTAMP}, #{refreshTokenExpireTime,jdbcType=TIMESTAMP}
       )
   </insert>
@@ -51,6 +52,9 @@
       <if test="userAgent != null">
         `USER_AGENT`,
       </if>
+        <if test="remoteHost != null">
+            `REMOTE_HOST`,
+        </if>
       <if test="refreshToken != null">
         `REFRESH_TOKEN`,
       </if>
@@ -68,6 +72,9 @@
       <if test="userAgent != null">
         #{userAgent,jdbcType=VARCHAR},
       </if>
+        <if test="remoteHost != null">
+            #{remoteHost,jdbcType=VARCHAR},
+        </if>
       <if test="refreshToken != null">
         #{refreshToken,jdbcType=VARCHAR},
       </if>
@@ -88,6 +95,9 @@
       <if test="userAgent != null">
         `USER_AGENT` = #{userAgent,jdbcType=VARCHAR},
       </if>
+        <if test="remoteHost != null">
+            `REMOTE_HOST` = #{remoteHost,jdbcType=VARCHAR},
+        </if>
       <if test="refreshToken != null">
         `REFRESH_TOKEN` = #{refreshToken,jdbcType=VARCHAR},
       </if>
@@ -104,6 +114,7 @@
     update bm_token
     set `USER_ID` = #{userId,jdbcType=INTEGER},
       `USER_AGENT` = #{userAgent,jdbcType=VARCHAR},
+      `REMOTE_HOST` = #{remoteHost,jdbcType=VARCHAR},
       `REFRESH_TOKEN` = #{refreshToken,jdbcType=VARCHAR},
       `REFRESH_TOKEN_CREATE_TIME` = #{refreshTokenCreateTime,jdbcType=TIMESTAMP},
       `REFRESH_TOKEN_EXPIRE_TIME` = #{refreshTokenExpireTime,jdbcType=TIMESTAMP}

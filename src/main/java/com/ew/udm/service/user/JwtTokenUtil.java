@@ -1,6 +1,8 @@
 package com.ew.udm.service.user;
 
 import com.ew.udm.configs.JwtHeaderConfig;
+import com.ew.udm.controller.req.AuthRequest;
+import com.ew.udm.controller.res.LoginResponse;
 import com.ew.udm.models.user.UserToken;
 import com.ew.udm.models.user.UserWithRole;
 import com.ew.udm.service.mapper.UserTokenMapper;
@@ -67,28 +69,27 @@ public class JwtTokenUtil implements Serializable {
         return key;
     }
 
-    private UserToken generateUserRefreshToken(int userId, String userAgent, int expireDays) {
-        UserToken token = userTokenMapper.selectByUserIdAndAgent(userId, userAgent);
+    private UserToken generateUserRefreshToken(int userId, AuthRequest authRequest) {
+        UserToken token = userTokenMapper.selectByUserIdAndAgent(userId, authRequest.getUserAgent());
+        Date now = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(now);
+        calendar.add(Calendar.DATE, authRequest.getRememberDays());
+        Date expires = calendar.getTime();
+
         if (token == null) {
             token = new UserToken();
             token.setUserId(userId);
-            token.setUserAgent(userAgent);
+            token.setUserAgent(authRequest.getUserAgent());
+
+            token.setRemoteHost(authRequest.getRemoteHost());
             token.setRefreshToken(generateUUID());
-            Date now = new Date();
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(now);
-            calendar.add(Calendar.DATE, expireDays);
-            Date expires = calendar.getTime();
             token.setRefreshTokenCreateTime(now);
             token.setRefreshTokenExpireTime(expires);
             userTokenMapper.insertSelective(token);
         } else {
+            token.setRemoteHost(authRequest.getRemoteHost());
             token.setRefreshToken(generateUUID());
-            Date now = new Date();
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(now);
-            calendar.add(Calendar.DATE, expireDays);
-            Date expires = calendar.getTime();
             token.setRefreshTokenCreateTime(now);
             token.setRefreshTokenExpireTime(expires);
             userTokenMapper.updateByPrimaryKeySelective(token);
@@ -101,16 +102,21 @@ public class JwtTokenUtil implements Serializable {
         return jwtHeaderConfig;
     }
 
-    public String generateNewToken(UserWithRole user, int expireDays, String userAgent) {
-        UserToken refreshToken = generateUserRefreshToken(user.getId(), userAgent, expireDays);
+    public LoginResponse generateNewToken(final UserWithRole user, final AuthRequest authRequest) {
+        UserToken refreshToken = generateUserRefreshToken(user.getId(), authRequest);
         Date now = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);
         calendar.add(Calendar.SECOND, expiration);
         Date expires = calendar.getTime();
-        SecretKey key = generateKey(userAgent);
-        JwtToken token = new JwtToken(user, now, expires, refreshToken.getRefreshTokenExpireTime(), user.getExpireTime());
-        return token.getBuilder().signWith(SignatureAlgorithm.HS512, key).compact();
+        SecretKey key = generateKey(authRequest.getUserAgent());
+        JwtToken jwtToken = new JwtToken(user, now, expires, refreshToken.getRefreshTokenExpireTime(), user.getExpireTime());
+        String accessToken = jwtToken.getBuilder().signWith(SignatureAlgorithm.HS512, key).compact();
+        return new LoginResponse(
+                accessToken, jwtToken.getCreated(), jwtToken.getTokenExp(),
+                refreshToken.getRefreshToken(),
+                refreshToken.getRefreshTokenCreateTime(),
+                refreshToken.getRefreshTokenExpireTime());
     }
 
     public JwtToken parseToken(String token, String userAgent) {

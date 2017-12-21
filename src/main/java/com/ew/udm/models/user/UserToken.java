@@ -12,6 +12,8 @@ public class UserToken implements Serializable {
 
     private String userAgent;
 
+    private String remoteHost;
+
     private String refreshToken;
 
     private Date refreshTokenCreateTime;
@@ -40,6 +42,14 @@ public class UserToken implements Serializable {
 
     public void setUserAgent(String userAgent) {
         this.userAgent = userAgent == null ? null : userAgent.trim();
+    }
+
+    public String getRemoteHost() {
+        return remoteHost;
+    }
+
+    public void setRemoteHost(String remoteHost) {
+        this.remoteHost = remoteHost;
     }
 
     public String getRefreshToken() {

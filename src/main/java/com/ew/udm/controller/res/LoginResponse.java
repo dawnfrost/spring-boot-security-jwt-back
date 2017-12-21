@@ -1,15 +1,29 @@
 package com.ew.udm.controller.res;
 
+import java.util.Date;
+
 /**
  * Created by wxy on 2017-12-18 13:48
  */
 public class LoginResponse {
     private String accessToken;
+    private Date accessTokenCreateTime;
+    private Date accessTokenExpireTime;
+
     private String refreshToken;
-    private long refreshTokenCreateTime;
-    private int refreshTokenExpire;
+    private Date refreshTokenCreateTime;
+    private Date refreshTokenExpireTime;
 
     public LoginResponse() {
+    }
+
+    public LoginResponse(String accessToken, Date accessTokenCreateTime, Date accessTokenExpireTime, String refreshToken, Date refreshTokenCreateTime, Date refreshTokenExpireTime) {
+        this.accessToken = accessToken;
+        this.accessTokenCreateTime = accessTokenCreateTime;
+        this.accessTokenExpireTime = accessTokenExpireTime;
+        this.refreshToken = refreshToken;
+        this.refreshTokenCreateTime = refreshTokenCreateTime;
+        this.refreshTokenExpireTime = refreshTokenExpireTime;
     }
 
     public LoginResponse(String accessToken) {
@@ -32,19 +46,47 @@ public class LoginResponse {
         this.refreshToken = refreshToken;
     }
 
-    public long getRefreshTokenCreateTime() {
+    public Date getRefreshTokenCreateTime() {
         return refreshTokenCreateTime;
     }
 
-    public void setRefreshTokenCreateTime(long refreshTokenCreateTime) {
+    public void setRefreshTokenCreateTime(Date refreshTokenCreateTime) {
         this.refreshTokenCreateTime = refreshTokenCreateTime;
     }
 
-    public int getRefreshTokenExpire() {
-        return refreshTokenExpire;
+    public Date getRefreshTokenExpireTime() {
+        return refreshTokenExpireTime;
     }
 
-    public void setRefreshTokenExpire(int refreshTokenExpire) {
-        this.refreshTokenExpire = refreshTokenExpire;
+    public void setRefreshTokenExpireTime(Date refreshTokenExpireTime) {
+        this.refreshTokenExpireTime = refreshTokenExpireTime;
+    }
+
+    public Date getAccessTokenCreateTime() {
+        return accessTokenCreateTime;
+    }
+
+    public void setAccessTokenCreateTime(Date accessTokenCreateTime) {
+        this.accessTokenCreateTime = accessTokenCreateTime;
+    }
+
+    public Date getAccessTokenExpireTime() {
+        return accessTokenExpireTime;
+    }
+
+    public void setAccessTokenExpireTime(Date accessTokenExpireTime) {
+        this.accessTokenExpireTime = accessTokenExpireTime;
+    }
+
+    @Override
+    public String toString() {
+        return "LoginResponse{" +
+                "accessToken='" + accessToken + '\'' +
+                ", accessTokenCreateTime=" + accessTokenCreateTime +
+                ", accessTokenExpireTime=" + accessTokenExpireTime +
+                ", refreshToken='" + refreshToken + '\'' +
+                ", refreshTokenCreateTime=" + refreshTokenCreateTime +
+                ", refreshTokenExpireTime=" + refreshTokenExpireTime +
+                '}';
     }
 }
