@@ -5,6 +5,10 @@ server:
       uri-encoding: UTF-8
 #  error:
 #    include-stacktrace: always
+cors:
+  allowOrigins:
+    - "*"
+    - "localhost"
 urls:
   ignoreAuth: /,/*.html,/favicon.ico,/**/*.html,/**/*.css,/**/*.js,/auth/**,/pass/**,/test/**
 jwt:

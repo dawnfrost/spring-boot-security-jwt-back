@@ -15,6 +15,7 @@ public class LoginResponse {
     private Date refreshTokenExpireTime;
 
     public LoginResponse() {
+
     }
 
     public LoginResponse(String accessToken, Date accessTokenCreateTime, Date accessTokenExpireTime, String refreshToken, Date refreshTokenCreateTime, Date refreshTokenExpireTime) {
