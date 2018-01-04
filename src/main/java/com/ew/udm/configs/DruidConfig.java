@@ -22,52 +22,52 @@ public class DruidConfig {
 
     private Logger logger = LoggerFactory.getLogger(DruidConfig.class);
 
-    @Value("${spring.datasource.xa.properties.url}")
+    @Value("${spring.datasource.url}")
     private String dbUrl;
 
-    @Value("${spring.datasource.xa.properties.username}")
+    @Value("${spring.datasource.username}")
     private String username;
 
-    @Value("${spring.datasource.xa.properties.password}")
+    @Value("${spring.datasource.password}")
     private String password;
 
-    @Value("${spring.datasource.xa.properties.driver-class-name}")
+    @Value("${spring.datasource.driver-class-name}")
     private String driverClassName;
 
-    @Value("${spring.datasource.xa.properties.initialSize}")
+    @Value("${spring.datasource.initialSize}")
     private int initialSize;
 
-    @Value("${spring.datasource.xa.properties.minIdle}")
+    @Value("${spring.datasource.minIdle}")
     private int minIdle;
 
-    @Value("${spring.datasource.xa.properties.maxActive}")
+    @Value("${spring.datasource.maxActive}")
     private int maxActive;
 
-    @Value("${spring.datasource.xa.properties.maxWait}")
+    @Value("${spring.datasource.maxWait}")
     private int maxWait;
 
-    @Value("${spring.datasource.xa.properties.timeBetweenEvictionRunsMillis}")
+    @Value("${spring.datasource.timeBetweenEvictionRunsMillis}")
     private int timeBetweenEvictionRunsMillis;
 
-    @Value("${spring.datasource.xa.properties.minEvictableIdleTimeMillis}")
+    @Value("${spring.datasource.minEvictableIdleTimeMillis}")
     private int minEvictableIdleTimeMillis;
 
-    @Value("${spring.datasource.xa.properties.validationQuery}")
+    @Value("${spring.datasource.validationQuery}")
     private String validationQuery;
 
-    @Value("${spring.datasource.xa.properties.testWhileIdle}")
+    @Value("${spring.datasource.testWhileIdle}")
     private boolean testWhileIdle;
 
-    @Value("${spring.datasource.xa.properties.testOnBorrow}")
+    @Value("${spring.datasource.testOnBorrow}")
     private boolean testOnBorrow;
 
-    @Value("${spring.datasource.xa.properties.testOnReturn}")
+    @Value("${spring.datasource.testOnReturn}")
     private boolean testOnReturn;
 
-    @Value("${spring.datasource.xa.properties.filters}")
+    @Value("${spring.datasource.filters}")
     private String filters;
 
-    @Value("${spring.datasource.xa.properties.logSlowSql}")
+    @Value("${spring.datasource.logSlowSql}")
     private String logSlowSql;
 
     @Bean
@@ -83,16 +83,6 @@ public class DruidConfig {
         reg.addInitParameter("loginPassword", password);
         reg.addInitParameter("logSlowSql", logSlowSql);
         return reg;
-    }
-
-    @Bean
-    public FilterRegistrationBean filterRegistrationBean() {
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-        filterRegistrationBean.setFilter(new WebStatFilter());
-        filterRegistrationBean.addUrlPatterns("/*");
-        filterRegistrationBean.addInitParameter("exclusions", "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*");
-        filterRegistrationBean.addInitParameter("profileEnable", "true");
-        return filterRegistrationBean;
     }
 
     @Bean
